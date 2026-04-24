@@ -1,10 +1,11 @@
 # 🛠️ [MANUAL NAME]
 
-- short summary of how to
+- short description of how to manual
+- which technology
 
 # 💣 [ISSUE]
 
-- what and how happened
+- what, when and how happened
 - if is it possible, place here screenshots
 
 # 🔎 [DIAGNOSTICS]
@@ -17,7 +18,8 @@
 
 # 💪 [WHAT I LEARNED]
 
-- skills, practices etc.
+- whoch skills
+- useful commands
 
 # ☑️ [BEST PRACTICES]
 
