@@ -18,30 +18,28 @@ During the creation of a new repository from my local machine, several Git-relat
 
 The first issue was that I forgot to create a `.gitignore` file, so my Python virtual environment (`venv`) was accidentally committed.
 
-The second issue was that I created the repository on GitHub with an initial `README.md`, but I did not pull the remote changes before performing other Git operations locally.
+<img width="1210" height="309" alt="image" src="https://github.com/user-attachments/assets/f81b3d59-b8d9-4e45-bdef-8559b6fecb30" />
 
-The local commit history looked like this:
+The second issue was that I created the repository on GitHub with an initial `README.md`, but I did not pull the remote changes before performing other Git operations locally.  
 
-```text
-e6ae977 Create new repository for project Python Learning Library
-c067599 Add gitignore and remove virtual environment
-e9773db Fix gitignore and remove venv
-```
+<img width="761" height="248" alt="image" src="https://github.com/user-attachments/assets/606e3f50-5b74-4b85-b9e3-a024063be5c9" />
+
+I tried to rebase origin:
+
+<img width="1099" height="515" alt="image" src="https://github.com/user-attachments/assets/fbde823d-8c53-4f5a-896f-f497a4131d54" />
+
 
 After that, I renamed the branch from `master` to `main`, attempted `git pull --rebase origin main`, aborted the rebase, and finally executed a reset to `origin/main`.
 
 The relevant entries in `git reflog` were:
 
 ```text
-16d09bf HEAD@{0}: reset: moving to origin/main
-e9773db HEAD@{1}: rebase (abort): returning to refs/heads/main
-16d09bf HEAD@{2}: rebase (start): checkout origin/main
-e9773db HEAD@{3}: rebase (abort): returning to refs/heads/main
-16d09bf HEAD@{4}: pull --rebase origin main (start)
-e9773db HEAD@{5}: Branch: renamed refs/heads/master to refs/heads/main
-e9773db HEAD@{7}: commit: Fix gitignore and remove venv
-c067599 HEAD@{8}: commit: Add gitignore and remove virtual environment
-e6ae977 HEAD@{9}: commit (initial): Create new repository for project Python Learning Library
+5d28336 (HEAD -> main) HEAD@{0}: rebase (abort): returning to refs/heads/main
+2a7296b (origin/main) HEAD@{1}: pull --rebase origin main (start): checkout 2a7296b6b786c1304661585285b650a34682758b
+5d28336 (HEAD -> main) HEAD@{2}: Branch: renamed refs/heads/master to refs/heads/main
+5d28336 (HEAD -> main) HEAD@{4}: commit: Fix gitignore and remove venv
+69be9ca HEAD@{5}: commit: Add gitignore and remove virtual environment
+54cc209 HEAD@{6}: commit (initial): Create new repository for project Python Learning Library
 ```
 
 As a result, my local files disappeared from the current branch and were not visible on GitHub either. At first, it looked as if all work had been permanently lost.
