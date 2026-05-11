@@ -1,47 +1,235 @@
-# 🛠️ [REVERSE AND MERGE WITH DATA LOST]
+# 🛠️ GIT RECOVERY - LOST LOCAL FILES AFTER RESET TO ORIGIN/MAIN
 
-- short description of how to manual
-- which technology
+Short description:
+This how-to describes a real Git incident that happened during the creation of a new GitHub repository for my Python project. Due to an incorrect workflow and the use of a destructive Git command, my local files disappeared from the current branch. This guide explains what happened, how the issue was diagnosed, how the data was recovered, and what best practices can prevent similar problems in the future.
 
-# 💣 [ISSUE]
+Technology:
+- Git
+- GitHub
+- WSL (Windows Subsystem for Linux)
+- Python
+- Virtual Environment (venv)
 
-- During the creation of new repositary from local machine occured a problem with commiting data. First issue was that I forgot to create .gitignore file for venv on local machine and second was that I created repository on GitHub with README.md, but I didn`t pull before other actions. Situation:
-  
-  e6ae977 Create new repositary for project Python Learning Library  
-  c067599 Add gitignore and remove virtual environment  
-  e9773db Fix gitignore and remove venv
+---
 
-- After that I changed master branch to main, tried pull --rebase withoit success. I aborted rebase and finaly made reset on origin/main. In reflog I found these activities:
+## 💣 ISSUE
 
-  16d09bf HEAD@{0}: reset: moving to origin/main  
-  e9773db HEAD@{1}: rebase (abort): returning to refs/heads/main   
-  16d09bf HEAD@{2}: rebase (start): checkout origin/main  
-  e9773db HEAD@{3}: rebase (abort): returning to refs/heads/main  
-  16d09bf HEAD@{4}: pull --rebase origin main (start)  
-  e9773db HEAD@{5}: Branch: renamed refs/heads/master to refs/heads/main  
-  e9773db HEAD@{7}: commit: Fix gitignore and remove venv  
-  c067599 HEAD@{8}: commit: Add gitignore and remove virtual environment  
-  e6ae977 HEAD@{9}: commit (initial): Create new repositary for project Python Learning Library
+During the creation of a new repository from my local machine, several Git-related problems occurred.
 
-# 🔎 [DIAGNOSTICS]
+The first issue was that I forgot to create a `.gitignore` file, so my Python virtual environment (`venv`) was accidentally committed.
 
-- what exactly was checked
+The second issue was that I created the repository on GitHub with an initial `README.md`, but I did not pull the remote changes before performing other Git operations locally.
 
-# ✅ [SOLUTION]
+The local commit history looked like this:
 
-- step by step solution
+```text
+e6ae977 Create new repository for project Python Learning Library
+c067599 Add gitignore and remove virtual environment
+e9773db Fix gitignore and remove venv
+```
 
-# 💪 [WHAT I LEARNED]
+After that, I renamed the branch from `master` to `main`, attempted `git pull --rebase origin main`, aborted the rebase, and finally executed a reset to `origin/main`.
 
-- whoch skills
-- useful commands
+The relevant entries in `git reflog` were:
 
-# ☑️ [BEST PRACTICES]
+```text
+16d09bf HEAD@{0}: reset: moving to origin/main
+e9773db HEAD@{1}: rebase (abort): returning to refs/heads/main
+16d09bf HEAD@{2}: rebase (start): checkout origin/main
+e9773db HEAD@{3}: rebase (abort): returning to refs/heads/main
+16d09bf HEAD@{4}: pull --rebase origin main (start)
+e9773db HEAD@{5}: Branch: renamed refs/heads/master to refs/heads/main
+e9773db HEAD@{7}: commit: Fix gitignore and remove venv
+c067599 HEAD@{8}: commit: Add gitignore and remove virtual environment
+e6ae977 HEAD@{9}: commit (initial): Create new repository for project Python Learning Library
+```
 
-- ideas to prevent issue next time
-- what is good for and what is risk
+As a result, my local files disappeared from the current branch and were not visible on GitHub either. At first, it looked as if all work had been permanently lost.
 
-# 🚈 [NEXT]
+---
 
-- advantages for future
+## 🔎 DIAGNOSTICS
 
+To understand what happened, I checked the current Git state and history.
+
+### Commands Used for Diagnosis
+
+```bash
+git status
+git remote -v
+git branch -vv
+git log --oneline --graph --all
+git reflog
+```
+
+The most important diagnostic command was `git reflog`, because the missing commits were no longer visible in the standard branch history, but they were still recorded in the reflog.
+
+---
+
+## ✅ SOLUTION
+
+### Step 1: Check Current State
+
+```bash
+git status
+```
+
+### Step 2: Check Visible History
+
+```bash
+git log --oneline --graph --all
+```
+
+### Step 3: Inspect Reflog
+
+```bash
+git reflog
+```
+
+### Step 4: Create Rescue Branch
+
+```bash
+git branch rescue-lost-work e9773db
+```
+
+### Step 5: Switch to Rescue Branch
+
+```bash
+git checkout rescue-lost-work
+```
+
+### Step 6: Verify Recovery
+
+```bash
+ls
+git status
+git log --oneline
+```
+
+All missing files were restored.
+
+### Step 7: Recover to Main Branch
+
+```bash
+git checkout main
+git merge rescue-lost-work
+```
+
+The safest approach was to recover the data into a separate branch first and only then decide how to integrate it.
+
+---
+
+## 💪 WHAT I LEARNED
+
+### Skills Practiced
+
+- Git recovery
+- Git reflog usage
+- Branch recovery
+- Understanding local vs remote history
+- Safe repository initialization
+- `.gitignore` management
+- Python virtual environment cleanup
+- Reset and rebase troubleshooting
+
+### Useful Commands
+
+```bash
+git status
+git remote -v
+git branch -vv
+git log --oneline --graph --all
+git reflog
+git branch rescue-lost-work <commit_hash>
+git checkout rescue-lost-work
+git cherry-pick <commit_hash>
+git merge <branch_name>
+```
+
+### Key Lessons
+
+- `git reset --hard origin/main` moves the branch pointer and overwrites the working tree.
+- `git reflog` records branch movements and can help recover commits that seem lost.
+- Lost work is not always permanently lost if the commit was created.
+
+---
+
+## ☑️ BEST PRACTICES
+
+### Clone Existing Repositories First
+
+```bash
+git clone git@github.com:username/repository.git
+cd repository
+```
+
+### Create `.gitignore` Before First Commit
+
+```gitignore
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+```
+
+### Always Check Status Before Risky Operations
+
+```bash
+git status
+```
+
+### Create Backup Branches Before Destructive Commands
+
+```bash
+git branch backup-before-reset
+```
+
+### Use `git fetch` to Inspect Remote Changes
+
+```bash
+git fetch origin
+git log --oneline --graph --all
+```
+
+### Be Very Careful with Destructive Commands
+
+Risky commands:
+- `git reset --hard`
+- `git clean -fd`
+- `git push --force`
+
+### Learn and Use `git reflog`
+
+`git reflog` should be part of every developer's troubleshooting toolkit.
+
+---
+
+## 🚈 NEXT
+
+This incident can be expanded into a more advanced Git recovery guide by adding:
+
+- screenshots of every important step
+- diagrams showing branch movement
+- explanations of `HEAD`, `origin/main`, and `reflog`
+- safe workflow examples
+- links to official Git documentation
+
+### Suggested Future How-To Topics
+
+- How to fix non-fast-forward push rejection
+- How to recover deleted files using `git reflog`
+- How to remove accidentally committed `.venv`
+- How to rename `master` to `main`
+- How to use `.gitignore` correctly in Python projects
+- How to create a rescue branch before risky Git operations
+
+### Benefits for the Future
+
+This experience improved my understanding of:
+- Git internals
+- disaster recovery
+- troubleshooting methodology
+- safe development workflows
+
+It also became a valuable portfolio example demonstrating practical problem-solving and real-world DevOps skills.
