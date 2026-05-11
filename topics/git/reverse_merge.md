@@ -20,16 +20,21 @@ The first issue was that I forgot to create a `.gitignore` file, so my Python vi
 
 <img width="1210" height="309" alt="image" src="https://github.com/user-attachments/assets/f81b3d59-b8d9-4e45-bdef-8559b6fecb30" />
 
+<br>
+
 The second issue was that I created the repository on GitHub with an initial `README.md`, but I did not pull the remote changes before performing other Git operations locally.  
 
 <img width="761" height="248" alt="image" src="https://github.com/user-attachments/assets/606e3f50-5b74-4b85-b9e3-a024063be5c9" />
+
+<br>
 
 I tried to rebase origin:
 
 <img width="1099" height="515" alt="image" src="https://github.com/user-attachments/assets/fbde823d-8c53-4f5a-896f-f497a4131d54" />
 
+<br>
 
-After that, I renamed the branch from `master` to `main`, attempted `git pull --rebase origin main`, aborted the rebase, and finally executed a reset to `origin/main`.
+After that, I renamed the branch from `master` to `main`, attempted `git pull --rebase origin main`, and aborted the rebase.
 
 The relevant entries in `git reflog` were:
 
@@ -87,7 +92,7 @@ git reflog
 ### Step 4: Create Rescue Branch
 
 ```bash
-git branch rescue-lost-work e9773db
+git branch rescue-lost-work 5d28336 
 ```
 
 ### Step 5: Switch to Rescue Branch
@@ -153,6 +158,14 @@ git merge <branch_name>
 ---
 
 ## ☑️ BEST PRACTICES
+
+### Create a Filesystem Backup (Old-School Method)
+
+Before performing risky Git operations, it can be useful to create a full copy of the project directory.
+
+```bash
+cp -r git-disaster-lab/ git-disaster-lab_backup
+```
 
 ### Clone Existing Repositories First
 
